@@ -5,8 +5,8 @@ use_frameworks!
 use_modular_headers!
 
 # Flutter Pod helper
-flutter_application_path = File.expand_path('../..', __FILE__)
-eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
+flutter_application_path = File.expand_path('..', __FILE__)
+eval(File.read(File.join(flutter_application_path, 'Flutter', 'podhelper.rb')), binding)
 
 target 'Runner' do
   use_frameworks!
