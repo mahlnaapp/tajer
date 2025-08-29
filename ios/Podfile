@@ -1,5 +1,27 @@
+# Uncomment this line to define a global platform for your project
 platform :ios, '15.0'
+
 use_frameworks!
+use_modular_headers!
+
+# Flutter Pod helper
+flutter_application_path = File.expand_path('../..', __FILE__)
+eval(File.read(File.join(flutter_application_path, '.ios', 'Flutter', 'podhelper.rb')), binding)
+
 target 'Runner' do
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods(flutter_application_path)
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    flutter_additional_ios_build_settings(target)
+
+    # Fix for iOS 12+ compatibility with Swift/ObjC
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
+  end
 end
