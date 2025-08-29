@@ -379,7 +379,11 @@ class MerchantProvider with ChangeNotifier {
       final categoriesRes = await _databases.listDocuments(
         databaseId: 'mahllnadb',
         collectionId: 'ProductCategories',
-        queries: [Query.equal('storeId', _storeId), Query.orderAsc('order')],
+        queries: [
+          Query.equal('storeId', _storeId),
+          Query.orderAsc('order'),
+          Query.limit(1000),
+        ],
       );
       _categories = categoriesRes.documents
           .map((doc) => ProductCategory.fromMap(doc.data))
@@ -389,7 +393,7 @@ class MerchantProvider with ChangeNotifier {
       final orderItemsRes = await _databases.listDocuments(
         databaseId: 'mahllnadb',
         collectionId: 'OrderItems',
-        queries: [Query.equal('storeId', _storeId)],
+        queries: [Query.equal('storeId', _storeId), Query.limit(1000)],
       );
 
       // استخراج orderIds الفريدة
