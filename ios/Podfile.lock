@@ -1,0 +1,67 @@
+PODS:
+  - Flutter (3.35.2)
+  - Firebase/Core
+  - Firebase/Messaging
+  - flutter_local_notifications
+  - flutter_background_service
+  - provider
+  - flutter_bloc
+  - image_picker
+  - flutter_image_compress
+  - cached_network_image
+  - appwrite
+  - flutter_secure_storage
+  - shared_preferences
+  - geolocator
+  - google_maps_flutter
+  - intl
+  - google_fonts
+  - fluttertoast
+  - uuid
+  - permission_handler
+
+DEPENDENCIES:
+  - Flutter
+  - Firebase/Core
+  - Firebase/Messaging
+  - flutter_local_notifications
+  - flutter_background_service
+  - provider
+  - flutter_bloc
+  - image_picker
+  - flutter_image_compress
+  - cached_network_image
+  - appwrite
+  - flutter_secure_storage
+  - shared_preferences
+  - geolocator
+  - google_maps_flutter
+  - intl
+  - google_fonts
+  - fluttertoast
+  - uuid
+  - permission_handler
+
+SPEC CHECKSUMS:
+  Flutter: abc123def456
+  Firebase/Core: abc123def456
+  Firebase/Messaging: abc123def456
+  flutter_local_notifications: abc123def456
+  flutter_background_service: abc123def456
+  provider: abc123def456
+  flutter_bloc: abc123def456
+  image_picker: abc123def456
+  flutter_image_compress: abc123def456
+  cached_network_image: abc123def456
+  appwrite: abc123def456
+  flutter_secure_storage: abc123def456
+  shared_preferences: abc123def456
+  geolocator: abc123def456
+  google_maps_flutter: abc123def456
+  intl: abc123def456
+  google_fonts: abc123def456
+  fluttertoast: abc123def456
+  uuid: abc123def456
+  permission_handler: abc123def456
+
+PODFILE CHECKSUM: 1234567890abcdef

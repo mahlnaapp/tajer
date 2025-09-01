@@ -1,4 +1,5 @@
 // main_merchant.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:appwrite/appwrite.dart';
 import 'package:intl/intl.dart';
@@ -572,9 +573,17 @@ class MerchantDashboard extends StatefulWidget {
   State<MerchantDashboard> createState() => _MerchantDashboardState();
 }
 
-class _MerchantDashboardState extends State<MerchantDashboard> {
+class _MerchantDashboardState extends State<MerchantDashboard>
+    with SingleTickerProviderStateMixin {
   int _currentTabIndex = 0;
   RealtimeSubscription? subscription;
+
+  // متحكمات البحث ومتغيرات الاستعلام
+  final TextEditingController _productSearchController =
+      TextEditingController();
+  final TextEditingController _orderSearchController = TextEditingController();
+  String _productSearchQuery = '';
+  String _orderSearchQuery = '';
 
   @override
   void initState() {
@@ -582,12 +591,29 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     if (widget.initialTabIndex != null) {
       _currentTabIndex = widget.initialTabIndex!;
     }
+
+    // إضافة المستمعين لحقول البحث
+    _productSearchController.addListener(() {
+      setState(() {
+        _productSearchQuery = _productSearchController.text;
+      });
+    });
+
+    _orderSearchController.addListener(() {
+      setState(() {
+        _orderSearchQuery = _orderSearchController.text;
+      });
+    });
+
     _startRealtimeListener();
   }
 
   @override
   void dispose() {
     subscription?.close();
+    // التخلص من المتحكمات
+    _productSearchController.dispose();
+    _orderSearchController.dispose();
     super.dispose();
   }
 
@@ -727,8 +753,8 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     );
   }
 
+  // تبويب لوحة التحكم (الرئيسية)
   Widget _buildDashboardTab(MerchantProvider provider) {
-    // ... الكود السابق
     final store = provider.store!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
@@ -862,8 +888,15 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     );
   }
 
+  // تبويب المنتجات
   Widget _buildProductsTab(MerchantProvider provider) {
-    // ... الكود السابق
+    // تطبيق الفلترة على قائمة المنتجات
+    final filteredProducts = provider.products.where((product) {
+      return product.name.toLowerCase().contains(
+        _productSearchQuery.toLowerCase(),
+      );
+    }).toList();
+
     return Column(
       children: [
         Padding(
@@ -872,6 +905,8 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
             children: [
               Expanded(
                 child: TextField(
+                  // ربط الحقل بالمتحكم
+                  controller: _productSearchController,
                   decoration: InputDecoration(
                     hintText: 'ابحث عن منتج...',
                     prefixIcon: const Icon(Icons.search),
@@ -891,14 +926,20 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.only(bottom: 16),
-            itemCount: provider.products.length,
+            // استخدام القائمة المفلترة
+            itemCount: filteredProducts.length,
             itemBuilder: (context, index) {
-              final product = provider.products[index];
+              final product = filteredProducts[index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: product.image.isNotEmpty
-                      ? Image.network(product.image, width: 50, height: 50)
+                      ? Image.network(
+                          product.image,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
                       : const Icon(Icons.shopping_bag),
                   title: Text(product.name),
                   subtitle: Text('${product.price} د.ع'),
@@ -925,8 +966,17 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     );
   }
 
+  // تبويب الطلبات
   Widget _buildOrdersTab(MerchantProvider provider) {
-    // ... الكود السابق
+    // تطبيق الفلترة على قائمة الطلبات
+    final filteredOrders = provider.orders.where((order) {
+      return order.customerName.toLowerCase().contains(
+            _orderSearchQuery.toLowerCase(),
+          ) ||
+          order.phone.contains(_orderSearchQuery) ||
+          order.id.toLowerCase().contains(_orderSearchQuery.toLowerCase());
+    }).toList();
+
     return Column(
       children: [
         Padding(
@@ -935,6 +985,8 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
             children: [
               Expanded(
                 child: TextField(
+                  // ربط الحقل بالمتحكم
+                  controller: _orderSearchController,
                   decoration: InputDecoration(
                     hintText: 'ابحث عن طلب...',
                     prefixIcon: const Icon(Icons.search),
@@ -950,9 +1002,10 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.only(bottom: 16),
-            itemCount: provider.orders.length,
+            // استخدام القائمة المفلترة
+            itemCount: filteredOrders.length,
             itemBuilder: (context, index) {
-              final order = provider.orders[index];
+              final order = filteredOrders[index];
 
               // حساب الإجمالي الجزئي للمتجر الحالي فقط
               double storeSubtotal = order.items.fold(
@@ -1077,8 +1130,12 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
     );
   }
 
+  // تبويب التصنيفات
   Widget _buildCategoriesTab(MerchantProvider provider) {
-    // ... الكود السابق
+    // إضافة متحكم (controller) لحقل النص
+    final TextEditingController categoryNameController =
+        TextEditingController();
+
     return Column(
       children: [
         Padding(
@@ -1087,18 +1144,38 @@ class _MerchantDashboardState extends State<MerchantDashboard> {
             children: [
               Expanded(
                 child: TextField(
+                  // ربط الحقل بالمتحكم
+                  controller: categoryNameController,
                   decoration: InputDecoration(
                     hintText: 'اسم التصنيف الجديد',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                   ),
-                  controller: TextEditingController(),
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.add),
-                onPressed: () => _showAddCategoryDialog(provider),
+                onPressed: () async {
+                  if (categoryNameController.text.isNotEmpty) {
+                    try {
+                      await provider.addCategory(categoryNameController.text);
+                      // إفراغ حقل النص بعد الإضافة
+                      categoryNameController.clear();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('تم إضافة التصنيف بنجاح')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('حدث خطأ: ${e.toString()}')),
+                      );
+                    }
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('الرجاء إدخال اسم التصنيف')),
+                    );
+                  }
+                },
               ),
             ],
           ),
