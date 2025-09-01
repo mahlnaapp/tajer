@@ -1,18 +1,17 @@
 # Podfile for Flutter project "appfotajer"
 platform :ios, '11.0'
 
-# use_frameworks!  # Uncomment if any plugin requires frameworks
+use_frameworks! # بعض Plugins يحتاجون frameworks
 use_modular_headers!
 
 target 'Runner' do
-  # Flutter Pod
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
-  # Firebase Pods
+  # Firebase
   pod 'Firebase/Core'
   pod 'Firebase/Messaging'
 
-  # Other plugin Pods
+  # Flutter Plugins
   pod 'flutter_local_notifications', :path => '.symlinks/plugins/flutter_local_notifications/ios'
   pod 'flutter_background_service', :path => '.symlinks/plugins/flutter_background_service/ios'
   pod 'provider', :path => '.symlinks/plugins/provider/ios'
