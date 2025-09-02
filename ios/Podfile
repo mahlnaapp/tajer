@@ -1,39 +1,36 @@
-# Podfile for Flutter project "appfotajer"
-platform :ios, '11.0'
+# Uncomment the next line to define a global platform for your project
+platform :ios, '15.0'
 
-use_frameworks! # بعض Plugins يحتاجون frameworks
-use_modular_headers!
+# CocoaPods analytics sends network stats synchronously affecting flutter build latency.
+ENV['COCOAPODS_DISABLE_STATS'] = 'true'
 
-target 'Runner' do
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+project 'Runner', {
+  'Debug' => :debug,
+  'Profile' => :release,
+  'Release' => :release,
+}
 
-  # Firebase
-  pod 'Firebase/Core'
-  pod 'Firebase/Messaging'
-
-  # Flutter Plugins
-  pod 'flutter_local_notifications', :path => '.symlinks/plugins/flutter_local_notifications/ios'
-  pod 'flutter_background_service', :path => '.symlinks/plugins/flutter_background_service/ios'
-  pod 'provider', :path => '.symlinks/plugins/provider/ios'
-  pod 'flutter_bloc', :path => '.symlinks/plugins/flutter_bloc/ios'
-  pod 'image_picker', :path => '.symlinks/plugins/image_picker/ios'
-  pod 'flutter_image_compress', :path => '.symlinks/plugins/flutter_image_compress/ios'
-  pod 'cached_network_image', :path => '.symlinks/plugins/cached_network_image/ios'
-  pod 'appwrite', :path => '.symlinks/plugins/appwrite/ios'
-  pod 'flutter_secure_storage', :path => '.symlinks/plugins/flutter_secure_storage/ios'
-  pod 'shared_preferences', :path => '.symlinks/plugins/shared_preferences/ios'
-  pod 'geolocator', :path => '.symlinks/plugins/geolocator/ios'
-  pod 'google_maps_flutter', :path => '.symlinks/plugins/google_maps_flutter/ios'
-  pod 'intl', :path => '.symlinks/plugins/intl/ios'
-  pod 'google_fonts', :path => '.symlinks/plugins/google_fonts/ios'
-  pod 'fluttertoast', :path => '.symlinks/plugins/fluttertoast/ios'
-  pod 'uuid', :path => '.symlinks/plugins/uuid/ios'
-  pod 'permission_handler', :path => '.symlinks/plugins/permission_handler/ios'
-
+def flutter_root
+  generated_xcode_build_settings_path = File.expand_path(File.join('..', 'Flutter', 'Generated.xcconfig'), __FILE__)
+  unless File.exist?(generated_xcode_build_settings_path)
+    raise "#{generated_xcode_build_settings_path} must exist. If you're running pod install manually, make sure flutter pub get is executed first"
+  end
+  File.foreach(generated_xcode_build_settings_path) do |line|
+    matches = line.match(/FLUTTER_ROOT\=(.*)/)
+    return matches[1].strip if matches
+  end
+  raise "FLUTTER_ROOT not found in #{generated_xcode_build_settings_path}"
 end
 
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    flutter_additional_ios_build_settings(target)
+require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelper'), flutter_root)
+
+target 'Runner' do
+  use_frameworks!
+  use_modular_headers!
+
+  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+
+  target 'RunnerTests' do
+    inherit! :search_paths
   end
 end
